@@ -436,33 +436,32 @@
 
             // More restricted movement on mobile
             const isMobile = window.innerWidth <= 600;
-            const padding = isMobile ? 40 : 20; // Extra padding on mobile
+            const padding = isMobile ? 50 : 20; // Extra padding on mobile
 
-            // Calculate safe boundaries
-            const maxX = containerRect.width - btnRect.width - padding;
-            const maxY = containerRect.height - btnRect.height - padding;
-            const minX = padding;
-            const minY = padding;
-
-            // On mobile, keep it more centered with restricted range
+            // On mobile, keep it more centered and away from bottom
             let randomX, randomY;
             if (isMobile) {
-                // Limit movement to middle 60% of container on mobile
+                // Keep button in center horizontally
                 const centerX = containerRect.width / 2;
-                const centerY = containerRect.height / 2;
-                const rangeX = (containerRect.width * 0.3); // 30% on each side
-                const rangeY = (containerRect.height * 0.3);
-
+                const rangeX = (containerRect.width * 0.25); // 25% on each side
                 randomX = centerX - rangeX + Math.random() * (rangeX * 2);
-                randomY = centerY - rangeY + Math.random() * (rangeY * 2);
+
+                // Keep button in upper 50% vertically to avoid bottom
+                const upperHalfY = containerRect.height * 0.4; // Top 40% of container
+                randomY = padding + Math.random() * upperHalfY;
             } else {
+                const minX = padding;
+                const minY = padding;
+                const maxX = containerRect.width - btnRect.width - padding;
+                const maxY = containerRect.height - btnRect.height - padding;
+
                 randomX = minX + Math.random() * (maxX - minX);
                 randomY = minY + Math.random() * (maxY - minY);
             }
 
-            // Ensure within bounds
-            randomX = Math.max(minX, Math.min(maxX, randomX));
-            randomY = Math.max(minY, Math.min(maxY, randomY));
+            // Final bounds check
+            randomX = Math.max(padding, Math.min(containerRect.width - btnRect.width - padding, randomX));
+            randomY = Math.max(padding, Math.min(containerRect.height - btnRect.height - padding, randomY));
 
             noBtn.style.position = 'absolute';
             noBtn.style.left = randomX + 'px';
