@@ -165,6 +165,50 @@
             animation: fadeOut 1s ease-out forwards;
         }
 
+        .countdown {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 2px dashed #ff4757;
+            font-size: 0.9em;
+            color: #2d3436;
+        }
+
+        .countdown-timer {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #ff4757;
+            margin-top: 8px;
+        }
+
+        .secret-message {
+            opacity: 0;
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            transform: scale(0.8);
+            transition: all 0.8s ease;
+            font-size: 1.1em;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .secret-message.reveal {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                box-shadow: 0 10px 40px rgba(255, 215, 0, 0.6);
+            }
+        }
+
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
@@ -278,6 +322,11 @@
             <h1>💕 Hey Sona! 💕</h1>
             <p class="question">Will you be my Valentine?</p>
 
+            <div class="countdown">
+                <div>⏰ Valentine's Day Countdown ⏰</div>
+                <div class="countdown-timer" id="countdown">Loading...</div>
+            </div>
+
             <div class="buttons" id="buttonContainer">
                 <button class="yes-btn" onclick="sayYes()">Yes! 💖</button>
                 <button class="no-btn" id="noBtn">No</button>
@@ -298,6 +347,10 @@
             </div>
 
             <p style="font-size: 2.5em; margin: 20px 0;">💕 🎉 😊 🌟</p>
+
+            <div class="secret-message" id="secretMessage">
+                ✨ P.S. - You're not just my Valentine, you're my every day. Can't wait to make more amazing memories with you! ✨
+            </div>
         </div>
     </div>
 
@@ -452,6 +505,9 @@
             document.querySelectorAll('.heart').forEach(heart => {
                 heart.style.animation = 'bounce 0.5s ease infinite';
             });
+
+            // Start secret message timer
+            showSecretMessage();
         }
 
         // Confetti explosion - fixed to explode from center
@@ -512,6 +568,53 @@
             }
             lastTouchEnd = now;
         }, false);
+
+        // Countdown Timer
+        function updateCountdown() {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+
+            // Valentine's Day for current year
+            let valentinesDay = new Date(currentYear, 1, 14); // Month is 0-indexed (1 = February)
+
+            // If Valentine's Day has passed this year, count to next year
+            if (now > valentinesDay) {
+                valentinesDay = new Date(currentYear + 1, 1, 14);
+            }
+
+            const diff = valentinesDay - now;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            const countdownEl = document.getElementById('countdown');
+            if (countdownEl) {
+                if (days === 0 && hours === 0 && minutes === 0 && seconds === 0) {
+                    countdownEl.innerHTML = "🎉 IT'S TODAY! 🎉";
+                } else {
+                    countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                }
+            }
+        }
+
+        // Update countdown every second
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        // Secret Message - appears after 10 seconds on success screen
+        let secretMessageTimer = null;
+
+        function showSecretMessage() {
+            secretMessageTimer = setTimeout(() => {
+                const secretMsg = document.getElementById('secretMessage');
+                if (secretMsg) {
+                    secretMsg.classList.add('reveal');
+                    secretMsg.style.animation = 'glow 2s ease-in-out infinite';
+                }
+            }, 10000); // 10 seconds
+        }
     </script>
 </body>
 </html>
